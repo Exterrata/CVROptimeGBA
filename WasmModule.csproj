@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
+		<TargetFramework>net9.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<SelfContained>true</SelfContained>
+		<PublishTrimmed>true</PublishTrimmed>
+		<RuntimeIdentifier>wasi-wasm</RuntimeIdentifier>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+
+<!--		<TieredCompilation>true</TieredCompilation>-->
+<!--		<IlcGenerateCompleteTypeMetadata>false</IlcGenerateCompleteTypeMetadata>-->
+<!--		<IlcGenerateStackTraceData>false</IlcGenerateStackTraceData>-->
+<!--		<IlcOptimizationPreference>Speed</IlcOptimizationPreference>-->
+<!--		<IlcFoldIdenticalMethodBodies>true</IlcFoldIdenticalMethodBodies>-->
+		
+		<DefineConstants>CVR_SCRIPTING_ENVIRONMENT</DefineConstants>
+		<DefineConstants>UNSAFE</DefineConstants>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Analyzer Include="C:\Users\Koneko\AppData\Local\ChilloutVR\CVRBuildTools\CCKWasmModule\WasmSourceGenerators.dll" />
+		<TrimmerRootAssembly Include="$(AssemblyName)" />
+		<PackageReference Include="Microsoft.DotNet.ILCompiler.LLVM" Version="9.0.0-preview.7.24406.1" />
+		<PackageReference Include="runtime.win-x64.Microsoft.DotNet.ILCompiler.LLVM" Version="9.0.0-preview.7.24406.1" />
+		<PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Remove="/Proxies/*"/>
+		<ProjectReference Include="/Proxies/Proxies.csproj" />
+		<Compile Include="C:\Users\Koneko\AppData\Local\ChilloutVR\CVRBuildTools\CCKWasmModule-dev/Module/**/*.cs" />
+	</ItemGroup>
+
+	<Target Name="MoveWasmOutput" AfterTargets="Publish">
+		<PropertyGroup>
+			<FinalOutputPath>$([System.IO.Path]::Combine('$(WasmOutputPath)', '$(AssemblyName).wasm'))</FinalOutputPath>
+		</PropertyGroup>
+		<Copy SourceFiles="$(PublishDir)$(AssemblyName).wasm" DestinationFiles="$(FinalOutputPath)" />
+	</Target>
+</Project>

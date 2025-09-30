@@ -1,6 +1,6 @@
 namespace OptimeGBA
 {
-    public delegate void AudioCallback(short[] stereo16BitInterleavedData);
+    public delegate void AudioCallback(float[] stereoInterleavedData);
  
     public abstract class Provider {
         public bool OutputAudio = true;

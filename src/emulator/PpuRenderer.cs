@@ -62,29 +62,29 @@ namespace OptimeGBA
             }
 
             // Load 3D placeholder
-            string[] resources = typeof(PpuRenderer).Assembly.GetManifestResourceNames();
-            Stream img = typeof(PpuRenderer).Assembly.GetManifestResourceStream(resources.First(name => name.EndsWith(".resources.3d-placeholder.raw")));
-            PlaceholderFor3D = new ushort[img.Length / 2];
-            int val = 0;
-            int index = 0;
-            while (val != -1)
-            {
-                val = img.ReadByte();
-                byte r = (byte)val;
-                val = img.ReadByte();
-                byte g = (byte)val;
-                val = img.ReadByte();
-                byte b = (byte)val;
-                val = img.ReadByte();
-                byte a = (byte)val;
+            //string[] resources = typeof(PpuRenderer).Assembly.GetManifestResourceNames();
+            //Stream img = typeof(PpuRenderer).Assembly.GetManifestResourceStream(resources.First(name => name.EndsWith(".resources.3d-placeholder.raw")));
+            PlaceholderFor3D = new ushort[0];
+            //int val = 0;
+            //int index = 0;
+            //while (val != -1)
+            //{
+            //    val = img.ReadByte();
+            //    byte r = (byte)val;
+            //    val = img.ReadByte();
+            //    byte g = (byte)val;
+            //    val = img.ReadByte();
+            //    byte b = (byte)val;
+            //    val = img.ReadByte();
+            //    byte a = (byte)val;
 
-                // Crush it to RGB555
-                r >>= 3;
-                g >>= 3;
-                b >>= 3;
+            //    // Crush it to RGB555
+            //    r >>= 3;
+            //    g >>= 3;
+            //    b >>= 3;
 
-                PlaceholderFor3D[index++] = (ushort)((b << 10) | (g << 5) | r);
-            }
+            //    PlaceholderFor3D[index++] = (ushort)((b << 10) | (g << 5) | r);
+            //}
         }
 
         // RGB555

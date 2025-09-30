@@ -41,14 +41,12 @@ namespace OptimeGBA
                     if (!R) val = BitSet(val, 8 - 8);
                     if (!L) val = BitSet(val, 9 - 8);
                     break;
-
                 case 0x4000136: // EXTKEYIN - ARM7 only
                     if (!X) val = BitSet(val, 0);
                     if (!Y) val = BitSet(val, 1);
                     if (!DebugButton) val = BitSet(val, 3);
                     if (!Touch) val = BitSet(val, 6);
                     if (!ScreensOpen) val = BitSet(val, 7);
-                    // System.Console.WriteLine(Util.Hex(val, 2));
                     break;
                 case 0x4000137: // EXTKEYIN B1
                     val = 0;

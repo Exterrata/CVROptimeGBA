@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 using static Util;
 
 namespace OptimeGBA
@@ -75,7 +76,7 @@ namespace OptimeGBA
                     break;
 
                 default:
-                    Console.WriteLine($"UNIMPLEMENTED FROM CP15 {opcode1},C{cRn},C{cRm},{opcode2}");
+                    Debug.Log($"UNIMPLEMENTED FROM CP15 {opcode1},C{cRn},C{cRm},{opcode2}");
                     break;
             }
 

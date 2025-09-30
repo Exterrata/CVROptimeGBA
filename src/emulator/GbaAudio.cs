@@ -253,8 +253,8 @@ namespace OptimeGBA
 
         const uint SampleTimerMax = 512;
         // public CircularBuffer<short> SampleBuffer = new CircularBuffer<short>(32768, 0);
-        public const uint SampleBufferMax = 256;
-        public short[] SampleBuffer = new short[SampleBufferMax];
+        public const uint SampleBufferMax = 32768;
+        public float[] SampleBuffer = new float[SampleBufferMax];
         public uint SampleBufferPos = 0;
         public bool AudioReady;
 
@@ -313,8 +313,8 @@ namespace OptimeGBA
                 }
             }
 
-            SampleBuffer[SampleBufferPos++] = (short)(left * 64);
-            SampleBuffer[SampleBufferPos++] = (short)(right * 64);
+            SampleBuffer[SampleBufferPos++] = left * 64f / short.MaxValue;
+            SampleBuffer[SampleBufferPos++] = right * 64f / short.MaxValue;
 
             if (SampleBufferPos >= SampleBufferMax)
             {

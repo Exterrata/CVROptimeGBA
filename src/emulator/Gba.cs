@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace OptimeGBA
 {
@@ -133,9 +134,9 @@ namespace OptimeGBA
             Cpu.InitFlushPipeline();
 
 #if UNSAFE
-            Console.WriteLine("Starting in memory UNSAFE mode");
+            Debug.Log("Starting in memory UNSAFE mode");
 #else
-            Console.WriteLine("Starting in memory SAFE mode");
+            Debug.Log("Starting in memory SAFE mode");
 #endif
         }
 

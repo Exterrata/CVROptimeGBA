@@ -302,7 +302,7 @@ namespace OptimeGBA
         public int SampleTimer;
 
         public const uint SampleBufferMax = 256;
-        public short[] SampleBuffer = new short[SampleBufferMax];
+        public float[] SampleBuffer = new float[SampleBufferMax];
         public uint SampleBufferPos = 0;
 
         public static sbyte[] IndexTable = { -1, -1, -1, -1, 2, 4, 6, 8 };
@@ -715,8 +715,8 @@ namespace OptimeGBA
                 // strip 19 to get 16 bits for our short output
                 uint effectiveMasterVol = MasterVolume;
                 if (effectiveMasterVol == 127) effectiveMasterVol++;
-                SampleBuffer[SampleBufferPos++] = (short)((left * effectiveMasterVol) >> 16);
-                SampleBuffer[SampleBufferPos++] = (short)((right * effectiveMasterVol) >> 16);
+                SampleBuffer[SampleBufferPos++] = (float)((left * effectiveMasterVol) >> 16) / short.MaxValue;
+                SampleBuffer[SampleBufferPos++] = (float)((right * effectiveMasterVol) >> 16) / short.MaxValue;
 
                 if (SampleBufferPos >= SampleBufferMax)
                 {

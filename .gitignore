@@ -1,11 +1,4 @@
-/bin
-/obj
-/roms/*
-!/roms/.gitkeep
-imgui.ini
-*.txt
-tests/
-.vs
-Properties
-*.bin
-samples
+﻿.idea
+bin
+obj
+Folder.DotSettings.user

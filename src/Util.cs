@@ -29,11 +29,6 @@ static class Util
         return $"0x{i.ToString("X").ToUpper().PadLeft(digits, '0')}";
     }
 
-    public static string Hex(ulong i, int digits)
-    {
-        return $"0x{i.ToString("X").ToUpper().PadLeft(digits, '0')}";
-    }
-
     public static string HexN(long i, int digits)
     {
         return i.ToString("X").ToUpper().PadLeft(digits, '0');

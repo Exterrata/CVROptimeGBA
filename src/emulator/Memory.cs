@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Collections.Concurrent;
 using static OptimeGBA.Bits;
 using System.Runtime.InteropServices;
+using UnityEngine;
 using static OptimeGBA.MemoryUtil;
 
 namespace OptimeGBA
@@ -95,7 +96,7 @@ namespace OptimeGBA
 #if DEBUG
             if ((addr & 1) != 0)
             {
-                Console.Error.WriteLine("Misaligned Read16! " + Util.HexN(addr, 8));
+                Debug.Log("Misaligned Read16! " + Util.HexN(addr, 8));
             }
 #endif
 
@@ -126,7 +127,7 @@ namespace OptimeGBA
 #if DEBUG
             if ((addr & 3) != 0)
             {
-                Console.Error.WriteLine("Misaligned Read32! " + Util.HexN(addr, 8));
+                Debug.Log("Misaligned Read32! " + Util.HexN(addr, 8));
             }
 #endif
 
