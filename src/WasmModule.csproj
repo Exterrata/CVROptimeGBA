@@ -1,12 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<WasmOutputPath>C:/Users/Koneko/Documents/CVRProjects/CCK/Assets/</WasmOutputPath>
-		<DefineConstants>CVR_SCRIPTING_ENVIRONMENT;UNSAFE</DefineConstants>
+		<DefineConstants></DefineConstants>
 	</PropertyGroup>
-	
+
 	<ItemGroup>
-		<PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
 	</ItemGroup>
-	
+
 	<Import Project="C:\Users\Koneko\AppData\Local\ChilloutVR\CVRBuildTools\CCKWasmModule-dev/WasmModule.props" />
 </Project>

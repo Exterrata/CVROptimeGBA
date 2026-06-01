@@ -1,17 +1,16 @@
 using System.Runtime.InteropServices;
-using System.Text;
 using CVR;
 using OptimeGBA;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using WasmScripting;
 
-public unsafe class GBAEmulator : WasmBehaviour {
-    private const double SecondsPerFrameGba = 1D / (16777216D / FrameCycles);
-    private const int FrameCycles = 280896;
+public unsafe partial class GBAEmulator : WasmBehaviour {
+    private const int CpuHz = 16777216;
     private const int Width = 240, Height = 160;
 
-    private static GBAEmulator Instance;
+    private static GBAEmulator _instance;
     private static Gba _gba;
     private static Texture2D _screen;
     private static uint* _frameBuffer;
@@ -29,11 +28,12 @@ public unsafe class GBAEmulator : WasmBehaviour {
     public Material Material;
     public AudioClip AudioClip;
     public AudioSource AudioSource;
+    public TMP_Text PerformanceInfo;
 
     private void Start() {
         Debug.Log("[Optime GBA] Starting");
         
-        Instance = this;
+        _instance = this;
         
         _screen = new(Width, Height, GraphicsFormat.R8G8B8A8_SRGB, TextureCreationFlags.None) { filterMode = FilterMode.Point };
         _frameBuffer = (uint*)Marshal.AllocHGlobal(Width * Height * sizeof(uint));
@@ -42,11 +42,11 @@ public unsafe class GBAEmulator : WasmBehaviour {
         try {
             Reload();
         } catch (Exception e) {
-            Debug.Log($"[Optime GBA] {e}");
+            Debug.LogError($"[Optime GBA] {e}");
         }
     }
 
-    private void Update() {
+    private void FixedUpdate() {
         if (_quit) return;
 
         if (Input.GetKeyDown(KeyCode.P)) {
@@ -97,20 +97,21 @@ public unsafe class GBAEmulator : WasmBehaviour {
             _nextFrameAt = currentSec;
         }
 
-        if (currentSec - _nextFrameAt >= SecondsPerFrameGba) {
-            double diff = currentSec - _nextFrameAt;
-            Debug.Log($"[Optime GBA] Can't keep up! Skipping {(int)(diff * 1000)} milliseconds");
-            _nextFrameAt = currentSec;
-        }
+        //if (currentSec - _nextFrameAt >= SecondsPerFrameGba) {
+        //    double diff = currentSec - _nextFrameAt;
+        //    Debug.Log($"[Optime GBA] Can't keep up! Skipping {(int)(diff * 1000)} milliseconds");
+        //    _nextFrameAt = currentSec;
+        //}
 
         if (currentSec >= _nextFrameAt) {
-            _nextFrameAt += SecondsPerFrameGba;
+            int frameCycles = (int)(CpuHz * Time.fixedDeltaTime);
+            _nextFrameAt += 1d / ((double)CpuHz / frameCycles);
             try {
-                _cyclesLeft += FrameCycles;
-                _cyclesRan += FrameCycles;
+                _cyclesLeft += frameCycles;
+                _cyclesRan += frameCycles;
                 while (_cyclesLeft > 0) _cyclesLeft -= (int)_gba.StateStep();
             } catch (Exception e) {
-                Debug.LogError(e);
+                Debug.LogError($"[Optime GBA] {e}");
                 _quit = true;
                 return;
             }
@@ -150,7 +151,7 @@ public unsafe class GBAEmulator : WasmBehaviour {
 
             _fpsEvalTimer += 1;
             
-            Debug.Log($"[Optime GBA] FPS: {_fps}, IPS: {_ips}");
+            PerformanceInfo.text = $"[Optime GBA] FPS: {_fps}, IPS: {_ips}";
         }
 
         if (_gba.Mem.SaveProvider.Dirty) {
@@ -158,14 +159,14 @@ public unsafe class GBAEmulator : WasmBehaviour {
             try {
                 FileStorage.WriteFile(_gba.Provider.SavPath, _gba.Mem.SaveProvider.GetSave());
             } catch (Exception e) {
-                Debug.Log($"[Optime GBA] Failed to write .sav file! ({e.Message})");
+                Debug.LogError($"[Optime GBA] Failed to write .sav file! ({e.Message})");
             }
         }
     }
 
     private static void Reload() {
         const string biosPath = "gba_bios.bin";
-        const string romPath = "Pokemon - Ruby Version (USA, Europe) (Rev 2).gba";
+        const string romPath = "game.gba";
         
         if (!FileStorage.FileExists(romPath)) {
             Debug.Log("[Optime GBA] The ROM file you provided does not exist.");
@@ -173,35 +174,31 @@ public unsafe class GBAEmulator : WasmBehaviour {
             return;
         }
         
-        Span<byte> romSpan = FileStorage.ReadFile(romPath);
-        byte[] rom = romSpan.ToArray();
-        fixed(void* romPtr = romSpan) Marshal.FreeHGlobal((IntPtr)romPtr);
+        CVRFile romFile = FileStorage.ReadFile(romPath);
+        
+        Debug.Log(romFile == null);
+        Debug.Log(romFile!._bytes == null);
+        byte[] rom = romFile.Bytes.ToArray();
 
         if (!FileStorage.FileExists(biosPath)) {
             Debug.LogError("[Optime GBA] Please place a valid GBA BIOS named \"gba_bios.bin\" which has been properly modified in the local storage for this world");
             _quit = true;
             return;
         }
-            
-        Span<byte> biosSpan = FileStorage.ReadFile(biosPath);
-        byte[] bios = biosSpan.ToArray();
-        fixed(void* biosPtr = biosSpan) Marshal.FreeHGlobal((IntPtr)biosPtr);
+        
+        byte[] bios = FileStorage.ReadFile(biosPath).Bytes.ToArray();
 
         string savPath = romPath.Substring(0, romPath.Length - 4) + ".sav";
         byte[] sav = [];
 
         if (FileStorage.FileExists(savPath)) {
             Debug.Log("[Optime GBA] .sav exists, loading");
-                
-            Span<byte> savSpan = FileStorage.ReadFile(savPath);
-            sav = savSpan.ToArray();
-            fixed(void* savPtr = savSpan) Marshal.FreeHGlobal((IntPtr)savPtr);
+            sav = FileStorage.ReadFile(savPath).Bytes.ToArray();
         } else {
             Debug.Log("[Optime GBA] .sav not available");
         }
 
-        ProviderGba provider = new(bios, rom, savPath, AudioReady) { BootBios = true };
-        _gba = new Gba(provider);
+        _gba = new(new(bios, rom, savPath, AudioReady) { BootBios = true });
 
         _gba.Mem.SaveProvider.LoadSave(sav);
 
@@ -211,8 +208,8 @@ public unsafe class GBAEmulator : WasmBehaviour {
     }
     
     private static void AudioReady(float[] data) {
-        Instance.AudioClip.SetData(data, 0);
-        Instance.AudioSource.Play();
+        _instance.AudioClip.SetData(data, 0);
+        _instance.AudioSource.Play();
     }
     
     [WasmImportLinkage, DllImport("UnityEngine")]
